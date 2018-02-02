@@ -32,14 +32,22 @@
   command: mongo {{ item.key }} --eval "{{ item.value|join(';') }}"
   with_dict: "{{mongodb_shell}}"
 
-- name: Create necesary users with access to databases
+- name: Create MongoDB root user
   mongodb_user:
-    name: "{{ item.0.name }}"
-    password: "{{ item.0.password }}"
-    database: "{{ item.1 }}"
-    state: present
+    login_port: "27017"
+    database: "admin"
+    name: "{{ mongodb_admin_user }}"
+    password: "{{ mongodb_admin_password }}"
+    roles: "{{ mongodb_admin_role }}"
+
+- name: Create MongoDB users
+  mongodb_user:
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    login_port: "27017"
+    database: "{{ mongodb_normal_database }}"
+    name: "{{ mongodb_normal_user }}"
+    password: "{{ mongodb_normal_password }}"
     roles:
-      - { db: "{{ item.1 }}", role: "{{ item.0.role }}" }
-  with_subelements:
-    - "{{ mongodb_users }}"
-    - databases
+      - { db: "admin", role: "{{ mongodb_normal_role }}" }
+      - { db: "{{ mongodb_normal_database }}", role: "{{ mongodb_normal_role }}" }
