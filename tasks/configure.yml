@@ -22,6 +22,9 @@
   notify: ["mongodb restart"]
   when: mongodb_transparent_hugepage_disable
 
+- name: mongodb start
+  service: name=mongod state=started daemon-reload=true
+
 - name: Ensure mongodb is started
   service: name={{ mongodb_daemon_name }} state=started enabled=yes
 
@@ -31,6 +34,10 @@
 - name: Run mongoshell commands
   command: mongo {{ item.key }} --eval "{{ item.value|join(';') }}"
   with_dict: "{{mongodb_shell}}"
+
+- name: Ensure mongod is unlocked 
+  become: yes
+  shell: export LC_ALL="en_US.UTF-8" ; mongod --fork --logpath /var/log/mongodb.log
 
 - name: Create necesary users with access to databases
   mongodb_user:
