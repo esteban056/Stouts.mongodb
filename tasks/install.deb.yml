@@ -21,7 +21,7 @@
   shell: echo "deb http://repo.mongodb.org/apt/debian jessie/mongodb-org/3.2 main" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list 
 
 - name: Install MongoDB package
-    become: yes
+  become: yes
   apt: 
     name: "{{mongodb_repository_data.package+'='+mongodb_version}}" 
     state: present 
