@@ -8,7 +8,7 @@
 
 - name: Add APT key
   apt_key: 
-    keyserver: keyserver.ubuntu.com 
+    keyserver: "{{mongodb_repository_data.keyserver}}"
     id: "{{mongodb_repository_data.key}}" 
     state: present
   become: yes
