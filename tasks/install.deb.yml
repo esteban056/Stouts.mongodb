@@ -7,13 +7,25 @@
     mongodb_repository_data: "{{mongodb_repository_config[mongodb_major_minor_version]}}"
 
 - name: Add APT key
-  apt_key: keyserver=keyserver.ubuntu.com id="{{mongodb_repository_data.key}}"
+  apt_key: 
+    keyserver: "{{mongodb_repository_data.keyserver}}"
+    id: "{{mongodb_repository_data.key}}" 
+    state: present
+  become: yes
 
-- name: Add APT repository
-  apt_repository: repo="{{mongodb_repository_data.repository}}" update_cache=yes
+#- name: Add APT repository
+#  apt_repository: repo="{{mongodb_repository_data.repository}}" update_cache=yes
+
+- name: Add mongo sources list
+  become: yes
+  shell: echo "deb http://repo.mongodb.org/apt/debian jessie/mongodb-org/3.2 main" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list 
 
 - name: Install MongoDB package
-  apt: name="{{mongodb_repository_data.package+'='+mongodb_version}}" state=present force=yes
+  become: yes
+  apt: 
+    name: "{{mongodb_repository_data.package+'='+mongodb_version}}" 
+    state: present 
+    update_cache: yes
 
 - name: Install additional packages
   apt: name={{item}}
